@@ -51,22 +51,25 @@ export default {
       }
     }, 20) // 浏览器的刷新通常是17毫秒一次，初始化操作放在20毫秒后，比较保险
 
+    // 监听window的resize事件
     window.addEventListener('resize', () => {
-      if (!this.slider || !this.slider.enabled) {
+      if (!this.slider || !this.slider.enabled) { // slider 没有初始化或者
         return
       }
-      clearTimeout(this.resizeTimer)
-      this.resizeTimer = setTimeout(() => {
-        // 判断当前 scroll 是否处于滚动动画过程中
-        if (this.slider.isInTransition) {
-          this._onScrollEnd()
-        } else {
-          if (this.autoPlay) {
-            this._play()
+      this._setSliderWidth(true)
+      this.slider.refresh()
+      /*      clearTimeout(this.resizeTimer)
+        this.resizeTimer = setTimeout(() => {
+          // 判断当前 scroll 是否处于滚动动画过程中
+          if (this.slider.isInTransition) {
+            this._onScrollEnd()
+          } else {
+            if (this.autoPlay) {
+              this._play()
+            }
           }
-        }
-        this.refresh()
-      }, 60)
+          this.refresh()
+        }, 60) */
     })
   },
   // keep-alive 组件激活时，slider再次被激活，并归于初始化状态
@@ -122,12 +125,12 @@ export default {
         scrollX: true, // 横向滚动
         scrollY: false, // 不允许纵向滚动
         momentum: false, // 当快速滑动时是否开启滑动惯性
-        snap: {
-          loop: this.loop, // 是否可以无缝循环轮播
-          threshold: 0.3, // 手动切换时的阈值
-          speed: 400,
-          click: true
-        }
+        snap: true,
+        snaploop: this.loop, // 是否可以无缝循环轮播
+        snapthreshold: 0.3, // 手动切换时的阈值
+        snapspeed: 400
+        // ,click: true
+
       })
 
       // 每次轮播图滚动完毕的时候触发
@@ -146,29 +149,42 @@ export default {
       })
     },
     // 滚动完毕触发
-    _onScrollEnd () {
+    _onScrollEnd() {
       let pageIndex = this.slider.getCurrentPage().pageX // 表示第几个子元素
       // 滚动到第几个图片，从0开始，与index对应
       if (this.loop) {
         pageIndex -= 1 // 默认会在开始复制一个，方便无缝切换
       }
-      /* this.currentPageIndex = pageIndex
+      this.currentPageIndex = pageIndex
       if (this.autoPlay) {
+        clearInterval(this.timer)
         this._play()
-      } */
+      }
     },
     /**
-     * 初始化小点点
-     * @private
-     */
+       * 初始化小点点
+       * @private
+       */
     _initDots() {
       this.dots = new Array(this.children.length) // 一个长度为5的空数组
     },
+    /**
+       * 播放方法
+       * @private
+       */
     _play() {
-      clearTimeout(this.timer)
+      /*      clearTimeout(this.timer)
+          this.timer = setTimeout(() => {
+            // 滚动到下一页
+            this.slider.next()
+          }, this.interval) */
+      let pageIndex = this.currentPageIndex + 1
+      if (this.loop) {
+        pageIndex += 1
+      }
       this.timer = setTimeout(() => {
-        // 滚动到下一页
-        this.slider.next()
+        // 滚动到下一页 横向轮播，400毫秒
+        this.slider.goToPage(pageIndex, 0, 400)
       }, this.interval)
     },
     refresh() {
@@ -186,23 +202,28 @@ export default {
 
   .slider
     min-height: 1px
+
     .slider-group
       position: relative
       overflow: hidden
       white-space: nowrap
+
       .slider-item
         float: left
         box-sizing: border-box
         overflow: hidden
         text-align: center
+
         a
           display: block
           width: 100%
           overflow: hidden
           text-decoration: none
+
         img
           display: block
           width: 100%
+
     .dots
       position: absolute
       right: 0
@@ -210,6 +231,7 @@ export default {
       bottom: 12px
       text-align: center
       font-size: 0
+
       .dot
         display: inline-block
         margin: 0 4px
@@ -217,6 +239,7 @@ export default {
         height: 8px
         border-radius: 50%
         background: $color-text-l
+
         &.active
           width: 20px
           border-radius: 5px

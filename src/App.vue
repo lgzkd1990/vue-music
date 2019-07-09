@@ -2,6 +2,8 @@
   <div id="app">
     <m-header></m-header>
     <tab></tab>
+    <!-- -->
+    <keep-alive></keep-alive>
     <router-view></router-view>
   </div>
 </template>
