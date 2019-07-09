@@ -19,10 +19,12 @@ export default new Router({
     }, {
       path: '/singer',
       component: Singer
-    }, {
+    },
+    {
       path: '/rank',
       component: Rank
-    }, {
+    },
+    {
       path: '/search',
       component: Search
     }

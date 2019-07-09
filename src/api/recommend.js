@@ -4,6 +4,9 @@ import axios from 'axios'
 
 const debug = process.env.NODE_ENV !== 'production'
 
+/**
+ * 获取推荐的轮播图
+ */
 export function getRecommend () {
   // QQ音乐轮播图api地址
   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
@@ -20,6 +23,7 @@ export function getRecommend () {
 
 /**
  * 获取歌单数据
+ * @returns {Promise<T | never>}
  */
 export function getDiscList () {
   const url = '/api/getDiscList'
@@ -44,6 +48,11 @@ export function getDiscList () {
   })
 }
 
+/**
+ * 获取歌手列表
+ * @param disstid
+ * @returns {Promise<T | never>}
+ */
 export function getSongList (disstid) {
   const url = debug ? '/api/getCdInfo' : 'http://ustbhuangyi.com/music/api/getCdInfo'
 
@@ -64,4 +73,3 @@ export function getSongList (disstid) {
     return Promise.resolve(res.data)
   })
 }
-
